@@ -29,8 +29,97 @@
     -webkit-font-smoothing:antialiased;
     overflow-x:hidden;
   }
+  body.cerrado{overflow:hidden}
 
-  /* marea: sube a lo largo del día, llena la pantalla a las 00:00 */
+  /* ============ pantalla de acceso ============ */
+  .puerta{
+    position:fixed;
+    inset:0;
+    z-index:10;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:2rem;
+    background:radial-gradient(120% 90% at 50% 100%,#3A0916 0%,var(--vino-profundo) 70%);
+    transition:opacity .9s ease, visibility .9s ease;
+  }
+  .puerta.abierta{opacity:0;visibility:hidden}
+
+  .puerta .encabezado{margin-bottom:1.25rem}
+
+  .puerta h2{
+    font-family:"Cormorant Garamond",Georgia,serif;
+    font-style:italic;
+    font-weight:300;
+    font-size:clamp(2.2rem,9vw,3.6rem);
+    line-height:1.05;
+    text-align:center;
+    margin-bottom:2.75rem;
+  }
+
+  .campo{
+    display:flex;
+    align-items:center;
+    gap:.75rem;
+    width:min(26rem,100%);
+    border-bottom:1px solid rgba(240,228,212,.28);
+    padding-bottom:.65rem;
+    transition:border-color .3s ease;
+  }
+  .campo:focus-within{border-color:var(--oro)}
+
+  .campo input{
+    flex:1;
+    min-width:0;
+    background:none;
+    border:none;
+    outline:none;
+    color:var(--papel);
+    font-family:"Cormorant Garamond",Georgia,serif;
+    font-size:1.5rem;
+    font-weight:300;
+    letter-spacing:.08em;
+  }
+  .campo input::placeholder{color:rgba(240,228,212,.3);letter-spacing:.02em}
+
+  .campo button{
+    background:none;
+    border:none;
+    cursor:pointer;
+    color:var(--oro);
+    font-family:"Karla",sans-serif;
+    font-size:.7rem;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    padding:.4rem .2rem;
+    transition:opacity .2s ease;
+  }
+  .campo button:hover{opacity:.65}
+  .campo button:focus-visible,
+  .campo input:focus-visible{outline:1px solid var(--oro);outline-offset:4px}
+
+  .aviso{
+    height:1.2rem;
+    margin-top:1.1rem;
+    font-size:.78rem;
+    letter-spacing:.06em;
+    color:#D4728C;
+    opacity:0;
+    transition:opacity .25s ease;
+  }
+  .aviso.visible{opacity:1}
+
+  @keyframes temblor{
+    0%,100%{transform:translateX(0)}
+    20%{transform:translateX(-7px)}
+    40%{transform:translateX(6px)}
+    60%{transform:translateX(-4px)}
+    80%{transform:translateX(3px)}
+  }
+  .campo.error{animation:temblor .4s ease}
+
+  /* ============ marea ============ */
   .marea{
     position:fixed;
     left:0; right:0; bottom:0;
@@ -121,14 +210,15 @@
   .verso{margin-bottom:3.75rem}
   .verso p{
     font-family:"Cormorant Garamond",Georgia,serif;
-    font-size:clamp(1.45rem,4.6vw,2rem);
-    line-height:1.5;
+    font-size:clamp(1.35rem,4.2vw,1.8rem);
+    line-height:1.6;
     font-weight:300;
   }
   .verso p em{font-style:italic;color:var(--oro)}
+  .sangria{display:inline-block;padding-left:2.5rem}
   .firma{
     display:block;
-    margin-top:1.1rem;
+    margin-top:1.4rem;
     font-family:"Karla",sans-serif;
     font-size:.68rem;
     letter-spacing:.2em;
@@ -168,11 +258,25 @@
   body.es-medianoche .lienzo{display:none}
 
   @media (prefers-reduced-motion:reduce){
-    .marea{transition:none}
+    .marea,.puerta{transition:none}
+    .campo.error{animation:none}
   }
 </style>
 </head>
-<body>
+<body class="cerrado">
+
+<!-- ============ pantalla de acceso ============ -->
+<div class="puerta" id="puerta">
+  <p class="encabezado">acceso restringido</p>
+
+
+  <div class="campo" id="campo">
+    <input type="password" id="clave" placeholder="la clave" autocomplete="off" autofocus aria-label="Contraseña">
+    <button id="entrar">Entrar</button>
+  </div>
+
+  <p class="aviso" id="aviso">Esa no es. Probá de nuevo.</p>
+</div>
 
 <div class="marea" id="marea"></div>
 
@@ -205,23 +309,22 @@
          ====================================================== -->
 
     <article class="verso">
-      <p>Shall I compare thee to a summer’s day?
-        Thou art more lovely and more temperate:
-        Rough winds do shake the darling buds of May,
-        And summer’s lease hath all too short a date;
-        Sometime too hot the eye of heaven shines,
-        And often is his gold complexion dimm'd;
-        And every fair from fair sometime declines,
-        By chance or nature’s changing course untrimm'd;
-        But thy eternal summer shall not fade,
-        Nor lose possession of that fair thou ow’st;
-        Nor shall death brag thou wander’st in his shade,
-        When in eternal lines to time thou grow’st:
-            So long as men can breathe or eyes can see,
-            So long lives this, and this gives life to thee.
-</p>
+      <p>Shall I compare thee to a summer’s day?<br>
+         Thou art more lovely and more temperate:<br>
+         Rough winds do shake the darling buds of May,<br>
+         And summer’s lease hath all too short a date;<br>
+         Sometime too hot the eye of heaven shines,<br>
+         And often is his gold complexion dimm’d;<br>
+         And every fair from fair sometime declines,<br>
+         By chance or nature’s changing course untrimm’d;<br>
+         But thy eternal summer shall not fade,<br>
+         Nor lose possession of that fair thou ow’st;<br>
+         Nor shall death brag thou wander’st in his shade,<br>
+         When in eternal lines to time thou grow’st:<br>
+         <span class="sangria">So long as men can breathe or eyes can see,</span><br>
+         <span class="sangria">So long lives this, and this gives life to thee.</span></p>
+      <span class="firma">William Shakespeare · Soneto XVIII</span>
     </article>
-
 
     <p class="cierre">El fondo se llena de a poco. Cuando el vino cubra toda la pantalla, son las doce.</p>
 
@@ -236,6 +339,36 @@
 
 <script>
 (function(){
+
+  /* ============ acceso ============ */
+  /* Cambiá la clave acá. Se ve en el código fuente: es decorativa, no protege nada. */
+  const CLAVE = 'culonademicorazón666';
+
+  const puerta = document.getElementById('puerta');
+  const campo  = document.getElementById('campo');
+  const input  = document.getElementById('clave');
+  const boton  = document.getElementById('entrar');
+  const aviso  = document.getElementById('aviso');
+
+  function intentar(){
+    if (input.value.trim() === CLAVE) {
+      puerta.classList.add('abierta');
+      document.body.classList.remove('cerrado');
+      setTimeout(() => { puerta.style.display = 'none'; }, 900);
+    } else {
+      aviso.classList.add('visible');
+      campo.classList.remove('error');
+      void campo.offsetWidth;
+      campo.classList.add('error');
+      input.select();
+    }
+  }
+
+  boton.addEventListener('click', intentar);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') intentar(); });
+  input.addEventListener('input', () => aviso.classList.remove('visible'));
+
+  /* ============ cuenta regresiva ============ */
   const hh = document.getElementById('hh');
   const mm = document.getElementById('mm');
   const ss = document.getElementById('ss');
@@ -244,16 +377,10 @@
 
   const dosDigitos = n => String(n).padStart(2, '0');
 
-  function objetivo(){
-    const ahora = new Date();
-    const t = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate() + 1, 0, 0, 0, 0);
-    return t;
-  }
-
   function tick(){
-    const ahora = new Date();
-    const fin = objetivo();
+    const ahora  = new Date();
     const inicio = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate(), 0, 0, 0, 0);
+    const fin    = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate() + 1, 0, 0, 0, 0);
 
     const restante = fin - ahora;
 
@@ -269,8 +396,7 @@
     mm.textContent = dosDigitos(Math.floor((seg % 3600) / 60));
     ss.textContent = dosDigitos(seg % 60);
 
-    const avance = (ahora - inicio) / (fin - inicio);
-    marea.style.height = (avance * 100).toFixed(3) + 'vh';
+    marea.style.height = (((ahora - inicio) / (fin - inicio)) * 100).toFixed(3) + 'vh';
   }
 
   tick();
